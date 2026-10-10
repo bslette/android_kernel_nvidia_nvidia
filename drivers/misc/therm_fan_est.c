@@ -911,6 +911,13 @@ static int therm_fan_est_probe(struct platform_device *pdev)
 	}
 	pr_info("THERMAL EST: thz register success.\n");
 
+	/*
+	 * Since 5.9 thermal zones start disabled; without this the governor never runs and the
+	 * fan stays at its initial cooling state regardless of temperature.
+	 */
+	if (thermal_zone_device_enable(est_data->thz))
+		pr_warn("THERMAL EST: failed to enable thermal zone\n");
+
 	/* workqueue related */
 	est_data->workqueue = alloc_workqueue(dev_name(&pdev->dev),
 				    WQ_HIGHPRI | WQ_UNBOUND, 1);
