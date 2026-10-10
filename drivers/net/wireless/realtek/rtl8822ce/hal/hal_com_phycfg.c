@@ -4144,8 +4144,13 @@ static int rtw_config_tx_powerlimit_from_hex(PADAPTER Adapter, const char *path)
 		} else if (j >= sec_2 && j < sec_3) {
 			i += 3;
 		} else {
+			/*
+			 * The power-limit section has no record count and runs to the end of the file.
+			 * The shipped rtl8822_setting.bin ends with 2 bytes after its last 6-byte record
+			 * (CRC still valid); failing here made the whole probe fail ("power init fail").
+			 */
 			if (i + 5 >= len)
-				return -1;
+				break;
 			phy_set_tx_power_limit_hex(Adapter,
 					"WW",
 					rtw_hex_setting_buf[i],
